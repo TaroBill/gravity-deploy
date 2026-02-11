@@ -1,6 +1,6 @@
 services:
   trino:
-    image: ghcr.io/brobridgeorg/plasma-trino:v0.0.20
+    image: ghcr.io/brobridgeorg/plasma-trino:v0.0.34
     container_name: trino
     ports:
       - "8081:8080"
@@ -26,7 +26,7 @@ services:
       POSTGRES_PASSWORD: rootpwd
       POSTGRES_DB: metastore
     ports:
-      - "5487:5432"
+      - "5432:5432"
     volumes:
       - ./assets/postgres-data:/var/lib/postgresql/data:Z
     networks:
@@ -110,7 +110,7 @@ services:
       - plasma
 
   plasma:
-    image: ghcr.io/brobridgeorg/plasma-deploy:v0.0.13
+    image: ghcr.io/brobridgeorg/plasma-deploy:v0.0.14
     container_name: plasma
     privileged: true
     user: "0"
