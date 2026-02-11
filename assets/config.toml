@@ -1,0 +1,112 @@
+[general]
+# service_url = "http://plasma-backend-service.gravity.svc.cluster.local:5001"
+service_url = "http://0.0.0.0:5001" # local
+# service_url = "http://plasma-backend-service:5001" # sit
+disabled_features = "atomic_operator_client, atomic_manager, atomic_manager_apis, atomic_package_repository, atomic_package_repository_apis, atomic_package_service, atomic_service, atomic_config_manager, atomic_config_manager_apis"
+#disabled_features = "trino_manager, query_manager, view_manager, data_catalog, data_product_manager, db_connection_manager, parameterized_view_manager"
+
+[internal_jetstream_server]
+port = 4222
+jetstream.store_dir = "./data/jetstream"
+jetstream.max_storage = 53687091200 # 50GB (50 * 1024 * 1024 * 1024)
+
+[web_service]
+port = 5001
+
+[jetstream_client]
+host = "0.0.0.0:4222"
+
+[database]
+path = "./data/plasma.db"
+
+[event_manager]
+domain = "plasma"
+jetstream.bucket_job = "jobs"
+
+[trino_manager]
+dsn = "http://admin@trino:8080/" # internal
+
+[query_manager]
+enabled = true
+catalog = "mysql"
+schema = "business"
+source = "demo_users"
+query_result_file_path = "./data/query_result_file"
+
+# s3 bucket name
+s3.bucket_name = "iceberg-warehouse"
+
+# Trino iceberg settings for catalog creation
+iceberg.catalog.type = "hive_metastore"
+hive.metastore.uri = "thrift://hive-metastore:9083"
+iceberg.file-format = "PARQUET"
+fs.native-s3.enabled = "true"
+s3.endpoint = "http://seaweedfs:8333"
+s3.aws-access-key = "admin"
+s3.aws-secret-key = "admin"
+s3.path-style-access = "true"
+s3.region = "us-east-1"
+
+# Metastore configs for trino catalog creation
+metastore_ctlgs_table_path = "metastore.public.ctlgs" # trino path to access metastore "CTLGS" table
+metastore_dbs_table_path = "metastore.public.dbs" # trino path to access metastore "DBS" table
+metastore_catalog_name = "metastore"
+metastore_connector_name = "postgresql"
+connection-url = "jdbc:postgresql://plasma-postgres:5432/metastore"
+connection-user = "postgres"
+connection-password = "rootpwd"
+case-insensitive-name-matching = "true"
+
+[user_manager]
+clear_on_start = false
+create_defaults = true
+delete_user_views = true
+
+[auth]
+auth_type = "external" # "internal", "external"
+
+# address of auth service (may differ from backend address if hosted externally, e.g. nginx)
+api_address.auth = "0.0.0.0:5001"
+
+# address of plasma (allows internal/external auth service to make api calls to backend)
+api_address.plasma = "0.0.0.0:5001"
+
+api_timeout = "5s"
+jwt.secret = "devsecretchangeme"
+jwt.issuer = "https://plasma.brobridge.com"
+jwt.sign_method = "HS256"
+jwt.access_ttl = "30m"
+jwt.refresh_ttl = ""
+
+[view_manager]
+url_mode = "header"
+base_url = "0.0.0.0:5001"
+
+[repository_manager]
+repos_path = "./data/git-repos"
+
+[git_http]
+url_prefix = "/git/repos"
+
+[atomic_operator_client]
+# operator_url = "http://plasma-operator.plasma-operator-system.svc.cluster.local:5001"
+
+[db_connection_manager]
+default_page = 1
+default_page_size = 10
+max_page_size = 100
+default_table_page_size = 50
+max_table_page_size = 1000
+max_open_connections = 1
+max_idle_connections = 1
+connection_max_lifetime = "10s"
+default_timeout = "30s"
+connection_timeout = "10s"
+query_timeout = "30s"
+max_connections = 100
+jetstream_max_retries = 30
+jetstream_retry_delay = "1s"
+
+[atomic_package_repository]
+path = "./data/atomic-packages"
+preload_path = "./data/preload-atomic-packages"
